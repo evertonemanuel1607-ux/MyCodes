@@ -5,7 +5,6 @@ def sum(num):
     for n in num:
         total += n
         
-
 def sub(num):
     global total
     for n in num:
