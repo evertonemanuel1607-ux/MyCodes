@@ -1,93 +1,62 @@
 import time
 import keyboard
 
-points = 0
-d = "right"
+
+# =========== VERSION 2.0 ==============
+
+last_dirc = "right"
 
 places = {
     "up" : ["0","0","0","0","0","0","0","0","0"],
-    "mid" : ["0","0","0","0","0","0","0","0","0"],
     "mid2" : ["0","0","0","0","0","0","0","0","0"],
-    "down" : ["0","0","0","0","0","0","0","0","0"]
+    "mid" : ["0","0","0","0","0","0","0","0","0"],
+    "down" : ["0","0","0","0","0","0","0","0","0"],
 }
 
-def keyboard_read():
-    global d
-    if keyboard.is_pressed("A"): # Preciso de uma manneira de manter o resultado da última aplicação, para assim ele posso continuar percorrer
-        d = "left"
-    elif keyboard.is_pressed("D"):
-        d = "right"
-    elif keyboard.is_pressed("W"):
-        d = "up"
-    elif keyboard.is_pressed("S"):
-        d = "down"
-    return d
-
-def show_places():
+def Showplaces():
     for p in places:
         print(" ".join(places[p]))
 
-def where_up(postion):
-    if postion == "down":
-        return "mid2"
-    elif postion == "mid2":
-        return "mid"
-    elif postion == "mid":
-        return "up"
-    elif postion == "up":
-        return "down"
-    
-def where_down(postion):
-    if postion == "down":
-        return "up"
-    elif postion == "mid2":
-        return "down"
-    elif postion == "mid":
-        return "mid2"
-    elif postion == "up":
-        return "mid"
 
-def walk():
+def Direction():
+    global last_dirc
+    if keyboard.is_pressed('D'):
+        last_dirc = "right"
+    elif keyboard.is_pressed('A'):
+        last_dirc = "left"
+    elif keyboard.is_pressed('S'):
+        last_dirc = "right"
+    elif keyboard.is_pressed("W"):
+        last_dirc = "right"
+    return last_dirc
+
+def search_rl():
     for p in places:
-        try:
-            if "1" in places[p] and keyboard_read() == "right":
-                ind = places[p].index("1")
-                if places[p][ind + 1] == "0":
-                    places[p][ind] = "0"
-                    places[p][ind + 1] = "1"
-            elif "1" in places[p] and keyboard_read() == "left":
-                ind = places[p].index("1")
-                if places[p][ind - 1] == "0":
-                    places[p][ind] = "0"
-                    places[p][ind - 1] = "1"
-            elif "1" in places[p] and keyboard_read() == "up":
-                ind = places[p].index("1")
-                if places[where_up(p)][ind] == "0":
-                    places[p][ind] = "0"
-                    places[where_up(p)][ind] = "1"
-            elif "1" in places[p] and keyboard_read() == "down":
-                ind = places[p].index("1")
-                if places[where_down(p)][ind] == "0":
-                    places[p][ind] = "0"
-                    places[where_down(p)][ind] = "1"
-                    
-            
-        except IndexError:
-            places[p][0] = "1"
-            places[p][ind] = "0"
+        if "1" in places[p]:
+            return [p , places[p].index("1")]
 
-
-
-print("=== Snake ===\n1- Start?\n2- Points")
-options = input("> ")
-if options == "1":
+def moves():
+    direction = Direction()
+    local = search_rl()[0]
+    indx = search_rl()[1]
+    if direction == "right":
+        if places[local][indx + 1] == "0":
+            places[local][indx] = "0"
+            places[local][indx + 1] = "1"
+    elif direction == "left":
+        if places[local][indx - 1] == "0":
+            places[local][indx] = "0"
+            places[local][indx - 1] = "1"
+           
+print("=== SNAKE GAME ===\n1- Start\n2- Points")
+choice = input("> ")
+if choice == "1":
     places["down"][4] = "1"
     while True:
-        show_places()
-        print("_____________________________")
-        time.sleep(1.5)
-        walk()
+        moves()
+        Showplaces()
+        print("==================================")
+        time.sleep(1)
         
 
-    
 
