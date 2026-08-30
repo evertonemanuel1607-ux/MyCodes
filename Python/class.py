@@ -1,110 +1,136 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 class Pessoa(ABC):
-    def __init__(self,nome,cpf):
+    def __init__(self,nome):
         self.__nome = nome 
-        self.__cpf = self.setcpf(cpf)
 
-    
-    def setcpf(self,var):
-        if var >= 1:
-            self.__cpf = var
-
-    
-    def getcpf(self):
-        return self.__cpf 
-
+    @abstractmethod
+    def info(self):
+        pass 
     def getnome(self):
+        return self.__nome 
+
+class Trabalhador(Pessoa):
+    def __init__(self, nome,cargo):
+        super().__init__(nome) 
+        self.__cargo = cargo 
+
+    def info(self):
+        return f"Nome: {self.getnome()} Cargo Atual: {self.__cargo}"
+
+    def setcargo(self,novo_cargo):
+        self.__cargo = novo_cargo 
+
+
+class Empresa():
+    def __init__(self,nome):
+        self.__nome = nome 
+        self.funcionarios = []
+
+    def addfunc(self,func):
+        self.funcionarios.append(func) 
+
+    def removefunc(self,func):
+        self.funcionarios.remove(func)
+
+    def listarfuncs(self):
+        for a in self.funcionarios:
+            return a.info() 
+        
+    def buscarfunc(self,func):
+        for f in self.funcionarios:
+            if f.getnome() == func:
+                return f 
+
+    def getnome_emp(self):
         return self.__nome
 
-class Estudantes(Pessoa):
-    def __init__(self, nome, cpf):
-        super().__init__(nome, cpf)
-        self.resultado = False
-
-    def getresultado(self):
-        if self.resultado == True:
-            return 'Aprovado'
-        else:
-            return 'Reprovado'
-    def setresultado(self,valor):
-        self.resultado = valor
-
-class Turma:
-    def __init__(self,nome):
-        self.nome = nome
-        self.__alunos = []
-
-    def addalunos(self,aluno):
-        if aluno not in self.__alunos:
-            self.__alunos.append(aluno)
-
-    def removealunos(self,id):
-        aluno = self.__alunos[id]
-        self.__alunos.remove(aluno)
-
-    def veralunos(self):
-        for a in self.__alunos:
-            return f"ID: {self.__alunos.index(a)} CPF: {a.getcpf()} Nome: {a.getnome()}"
-        
-    def buscaraluno(self,id):
-        aluno = self.__alunos[id]
-        return aluno
 
 
-def turmasfun(turma):
-    print("=== Turmas ===\n1- Ver alunos\n2- Adicionar\n3- Remover\n4- Alterar nota")
-    escolhafun = input("> ")
-    if escolhafun == '1':
-        print(turma.veralunos())
-    elif escolhafun == '2':
-        nome = input('Nome aluno: ')
-        cpf = int(input('CPF do aluno: '))
-        a = Estudantes(nome,cpf)
-        turma.addalunos(a)
-        print(f"Aluno {nome} adicionado com sucesso!")
-    elif escolhafun == '3':
-        ida = int(input('ID: '))
-        turma.removealunos(ida) 
-        print("Aluno removido! ")
-    elif escolhafun == '4':
-        ida = int(input('ID: '))
-        aluno = turma.buscaraluno(ida) 
-        if aluno:
-            print(f"Aluno encontrado! {aluno.getnome()}")
-            resultado = input("Ele passou? [S/N]: ")
-            if resultado == 'S':
-                aluno.setresultado(True)
-                print("Alteração feita!")
+def menu_1():
+    global empresas
+    while True:
+        for e in empresas:
+            print(f"ID: {empresas.index(e)} Nome: {e.getnome_emp()}")
+        escolha = input("=== EMPRESAS ===\n1- Acessar\n2- Voltar ")
+        if escolha == '1':
+            empresa_selecionada = int(input("ID: "))
+            menu_2(empresas[empresa_selecionada])
+        elif escolha == '2':
+            print("Voltando...")
+            break
+
+def menu_2(empresa:Empresa):
+    while True:
+        print('=== ALTERAR ===\n1- Ver Funcionários\n2- Adicionar Funcionários\n3- Remover\n4- Buscar')
+        escolha = input("> ")
+        if escolha == "1":
+            print(empresa.listarfuncs())
+
+        elif escolha == "2":
+            nome_func = input("Nome do Funcionário: ")
+            cargo_func = input("Cargo do Funcionário: ")
+            novo_func = Trabalhador(nome_func,cargo_func)
+            empresa.addfunc(novo_func)
+            print("Novo funcionário adicionado com sucesso!")
+
+        elif escolha == '3':
+            print("Em desenvolvimento...")
+
+        elif escolha == '4':
+            func_nome = input("Nome: ")
+            funcionario = empresa.buscarfunc(func_nome)
+            if funcionario:
+                print("Funcionário encontrado! Visualizar? [S/N]")
+                escolha2 = input("> ")
+                if escolha2 == "S":
+                    menu_3(funcionario)
+                else:
+                    print("Ok!")
             else:
-                aluno.setresultado(False)
-                print('Alteração feita!')
+                print("Opss..não encontrei!")
+        elif escolha == "5":
+            print("Voltando...")
+            break
+
+def menu_3(func:Trabalhador):
+    while True:
+        print(f"{func.info()}\n1- Mudar Cargo\n2- Saída")
+        escolha = input("> ")
+        if escolha == "1":
+            novo_cargo = input("Novo Cargo: ")
+            func.setcargo(novo_cargo)
+            print("Alteração feita com sucesso!")
+        elif escolha == "2":
+            print("Voltando...")
+            break
 
 
 
 
-turmas = []
+empresas = []
 
 while True:
-    print("=== ESCOLA ===\n1- Criar Turma\n2- Acessar Turma\n3- Saída...")
+    print("=== EMPRESAS ===\n1- Criar Empresa\n2- Acessar empresa\n3- Saída")
     escolha = input("> ")
-    if escolha == '3':
-        break
-    elif escolha == '2':
-        if turmas:
-            for t in turmas:
-                print(f"ID: {turmas.index(t)} Nome: {t.nome}")
-            escolha2 = int(input("Qual acessar? (id): "))
-            turma_escolhida = turmas[escolha2]
-            turmasfun(turma_escolhida)
+    if escolha == "1":
+        nome_emp = input("Nome da empresa: ")
+        empresa = Empresa(nome_emp)
+        empresas.append(empresa)
+        print("Empresa Criada com Sucesso!")
+    elif escolha == "2":
+        if empresas:
+            menu_1()
         else:
-            print("Opss...não tem nada")
-    elif escolha == '1':
-        nome_turma = input("Nome da Turma: ")
-        t = Turma(nome_turma)
-        turmas.append(t)
-        print("Turma Cadastrada com sucesso!")
+            print("Nenhuma empresa...")
+    elif escolha == "3":
+        print("Volte sempre...")
+        break
+
+
+        
+        
+        
+
     
-
-
-print("Volte sempre...")
+        
