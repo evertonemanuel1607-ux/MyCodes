@@ -89,7 +89,7 @@ def moves():
             elif places[next_down(local)][indx] == "2":
                 places[local][indx] = "0"
                 places[next_down(local)][indx] = "1"
-                points =+ 10
+                points += 10
     if local == local_a and indx == ind_a:
         ind_a, local_a = setapple()
         places[local_a][ind_a] = "2"
